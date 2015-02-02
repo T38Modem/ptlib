@@ -466,7 +466,6 @@ PMonitoredSockets::PMonitoredSockets(bool reuseAddr, PNatMethod  * nat)
 {
 }
 
-
 bool PMonitoredSockets::CreateSocket(SocketInfo & info, const PIPSocket::Address & binding)
 {
   delete info.socket;
@@ -486,7 +485,12 @@ bool PMonitoredSockets::CreateSocket(SocketInfo & info, const PIPSocket::Address
     }
   }
 
-  info.socket = new PUDPSocket(localPort, (int) (binding.GetVersion() == 6 ? AF_INET6 : AF_INET));
+  PQoS * myPQoS = new PQoS(0x1C);  // This is for Verizon Cert SIP Packets need DiffServ AF32
+  PTRACE(4, "MonSock\tCreating bundled UDP socket " << binding << " with QoS=" << myPQoS->GetDSCP());
+  info.socket = new PUDPSocket(myPQoS, localPort, (int) (binding.GetVersion() == 6 ? AF_INET6 : AF_INET));
+  delete myPQoS;
+  PBoolean result = info.socket->ApplyQoS();
+  PTRACE(4, "MonSock\tApplying QoS result: " << result);
   if (info.socket->Listen(binding, 0, localPort, reuseAddress?PIPSocket::CanReuseAddress:PIPSocket::AddressIsExclusive)) {
     PTRACE(4, "MonSock\tCreated bundled UDP socket " << binding << ':' << info.socket->GetPort());
     int sz = 0;

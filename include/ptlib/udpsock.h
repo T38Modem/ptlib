@@ -164,6 +164,10 @@ class PUDPSocket : public PIPDatagramSocket
     /** Manually Enable GQoS Support
      */
     static void EnableGQoS();
+
+    // Modify the QOS settings
+    virtual PBoolean ApplyQoS();
+
   //@}
 
   protected:
@@ -177,9 +181,6 @@ class PUDPSocket : public PIPDatagramSocket
 
     // Create a QOS-enabled socket
     virtual PBoolean OpenSocketGQOS(int af, int type, int proto);
-
-    // Modify the QOS settings
-    virtual PBoolean ApplyQoS();
 
     virtual const char * GetProtocolName() const;
 

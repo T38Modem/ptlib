@@ -2643,10 +2643,14 @@ PBoolean PUDPSocket::ApplyQoS()
 {
   char DSCPval = 0;
 #ifndef _WIN32_WCE
+
+  PTRACE(1,"QOS\tApplyQoS DSCP=" << qosSpec.GetDSCP());
   if (qosSpec.GetDSCP() < 0 ||
       qosSpec.GetDSCP() > 63) {
-    if (qosSpec.GetServiceType() == SERVICETYPE_PNOTDEFINED)
+    if (qosSpec.GetServiceType() == SERVICETYPE_PNOTDEFINED) {
+      PTRACE(1,"QOS\tApplyQoS " << qosSpec.GetDSCP() << " Not Defined");
       return PTrue;
+    }
     else {
       switch (qosSpec.GetServiceType()) {
         case SERVICETYPE_GUARANTEED:
@@ -2660,10 +2664,13 @@ PBoolean PUDPSocket::ApplyQoS()
           DSCPval = PQoS::bestEffortDSCP;
           break;
       }
+      PTRACE(1,"QOS\tApplyQoS DSCPval: " << (int)DSCPval);
     }
   }
-  else
+  else {
     DSCPval = (char)qosSpec.GetDSCP();
+    PTRACE(1,"QOS\tApplyQoS DSCPval: " << (int)DSCPval);
+  }
 #else
   DSCPval = 0x38;
   disableGQoS = PFalse;
@@ -2732,6 +2739,7 @@ PBoolean PUDPSocket::ApplyQoS()
   unsigned int curval = 0;
   socklen_t cursize = sizeof(curval);
   rv = ::getsockopt(os_handle,IPPROTO_IP, IP_TOS, (char *)(&curval), &cursize);
+  PTRACE(1,"QOS\tsetDSCP:  " << setDSCP << " DSCPval: " << (int)DSCPval << " curval: " << curval);
   if (curval == setDSCP)
     return PTrue;    //Required DSCP already set
 
