@@ -36,7 +36,7 @@
 #define MAJOR_VERSION 2
 #define MINOR_VERSION 10
 #define BUILD_TYPE ReleaseCode
-#define BUILD_NUMBER 14
+#define BUILD_NUMBER 15
 
 
 #endif  // _PTLib_VERSION_H
